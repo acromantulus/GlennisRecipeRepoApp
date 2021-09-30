@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GlennisRecipeRepoApp.Data;
 using GlennisRecipeRepoApp.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GlennisRecipeRepoApp.Controllers
 {
@@ -23,6 +24,18 @@ namespace GlennisRecipeRepoApp.Controllers
         public async Task<IActionResult> Index()
         {
             return View(await _context.Recipe.ToListAsync());
+        }
+
+        // GET: Recipes/ShowSearchForm
+        public async Task<IActionResult> ShowSearchForm()
+        {
+            return View();
+        }
+
+        // GET: Recipes/ShowSearchResults
+        public async Task<IActionResult> ShowSearchResults(string SearchPhrase)
+        {
+            return View("Index", await _context.Recipe.Where( r => r.Title.Contains(SearchPhrase)).ToListAsync());
         }
 
         // GET: Recipes/Details/5
@@ -44,6 +57,7 @@ namespace GlennisRecipeRepoApp.Controllers
         }
 
         // GET: Recipes/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -52,6 +66,7 @@ namespace GlennisRecipeRepoApp.Controllers
         // POST: Recipes/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Instructions,ImagePath")] Recipe recipe)
@@ -66,6 +81,7 @@ namespace GlennisRecipeRepoApp.Controllers
         }
 
         // GET: Recipes/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -84,6 +100,7 @@ namespace GlennisRecipeRepoApp.Controllers
         // POST: Recipes/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Instructions,ImagePath")] Recipe recipe)
@@ -117,6 +134,7 @@ namespace GlennisRecipeRepoApp.Controllers
         }
 
         // GET: Recipes/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -137,6 +155,7 @@ namespace GlennisRecipeRepoApp.Controllers
         // POST: Recipes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var recipe = await _context.Recipe.FindAsync(id);
