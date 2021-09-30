@@ -1,23 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GlennisRecipeRepoApp.Data;
 using GlennisRecipeRepoApp.Models;
+using GlennisRecipeRepoApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 
 namespace GlennisRecipeRepoApp.Controllers
 {
     public class RecipesController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public RecipesController(ApplicationDbContext context)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public RecipesController(ApplicationDbContext context, IWebHostEnvironment webHostEnviornment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnviornment;
         }
 
         // GET: Recipes
@@ -69,15 +74,39 @@ namespace GlennisRecipeRepoApp.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Instructions,ImagePath")] Recipe recipe)
+        public async Task<IActionResult> Create([Bind("Id,Title,Instructions,ImagePath")] RecipeViewModel recipeVM)
         {
             if (ModelState.IsValid)
             {
+                string stringFileName = UploadFile(recipeVM);
+                var recipe = new Recipe
+                {
+                    Title = recipeVM.Title,
+                    Instructions = recipeVM.Instructions,
+                    ImagePath = stringFileName
+                };
                 _context.Add(recipe);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(recipe);
+            return RedirectToAction("Index");
+        }
+
+        private string UploadFile(RecipeViewModel recipeViewModel)
+        {
+            string fileName = null;
+            if (recipeViewModel.ImagePath != null)
+            {
+                string uploadDir = Path.Combine(_webHostEnvironment.WebRootPath, "Images");
+                fileName = Guid.NewGuid().ToString() + "-" + recipeViewModel.ImagePath.FileName;
+                string filePath = Path.Combine(uploadDir, fileName);
+                using (var fileStream = new FileStream(filePath,FileMode.Create))
+                {
+                    recipeViewModel.ImagePath.CopyTo(fileStream);
+                }
+            }
+
+            return fileName;
         }
 
         // GET: Recipes/Edit/5

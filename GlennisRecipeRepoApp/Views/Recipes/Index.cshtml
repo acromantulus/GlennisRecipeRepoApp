@@ -26,7 +26,7 @@
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ImagePath)
+                <img src="~/Images/@item.ImagePath" class="rounded-circle" width="40" height="40" asp-append-version="true"/>
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
