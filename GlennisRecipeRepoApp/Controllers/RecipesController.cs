@@ -74,22 +74,22 @@ namespace GlennisRecipeRepoApp.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Instructions,ImagePath")] RecipeViewModel recipeVM)
+        public async Task<IActionResult> Create([Bind("Id,Title,Instructions,ImagePath")] RecipeViewModel recipeViewModel)
         {
             if (ModelState.IsValid)
             {
-                string stringFileName = UploadFile(recipeVM);
+                string stringFileName = UploadFile(recipeViewModel);
                 var recipe = new Recipe
                 {
-                    Title = recipeVM.Title,
-                    Instructions = recipeVM.Instructions,
+                    Title = recipeViewModel.Title,
+                    Instructions = recipeViewModel.Instructions,
                     ImagePath = stringFileName
                 };
                 _context.Add(recipe);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
         private string UploadFile(RecipeViewModel recipeViewModel)
