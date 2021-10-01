@@ -58,6 +58,7 @@ namespace GlennisRecipeRepoApp.Controllers
                 return NotFound();
             }
 
+            //recipe.ImagePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", recipe.ImagePath);
             return View(recipe);
         }
 
