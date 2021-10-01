@@ -14,5 +14,6 @@ namespace GlennisRecipeRepoApp.Data
         {
         }
         public DbSet<GlennisRecipeRepoApp.Models.Recipe> Recipe { get; set; }
+        public DbSet<GlennisRecipeRepoApp.Models.Feedback> Feedback { get; set; }
     }
 }
